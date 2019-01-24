@@ -20,6 +20,8 @@ import isArray from 'lodash/isArray';
 import isFunction from 'lodash/isFunction';
 import keys from 'lodash/keys';
 import set from 'lodash/set';
+import toPath from 'lodash/toPath';
+import defaultTo from 'lodash/defaultTo';
 
 const FORM_WHITELIST = [
   Input,
@@ -431,23 +433,24 @@ export default class SemanticUiReactValidatedForm extends Component {
     const { validateSchema } = this.props;
     const { activeSchema } = this.state;
 
-    let _name = this.handleArrayName(el.props.name);
-    const notYetAttached = !get(activeSchema, _name);
-    const shouldBeAttached = get(validateSchema, _name);
+    let _name = toPath(el.props.name);
+    const notYetAttached = !get(activeSchema, _name[0]);
+    const shouldBeAttached = get(validateSchema, _name[0]);
     return notYetAttached && shouldBeAttached;
   };
 
-  //TODO: currently only does arrays one level deep
-  // a resursive pattern might handle n-level arrary depth
-  // but then again... you can just use a new
-  // ValidatedForm
-  handleArrayName = name => {
-    let _name = name;
-    if (indexOf(_name, '[') > -1) {
-      _name = _name.substr(0, indexOf(_name, '['));
+  getInnerSchema(schema, path) {
+    if(schema.schemaType !== 'array') {
+      return defaultTo(get(schema, path[0]), schema);
     }
-    return _name;
-  };
+
+    let inner = schema._inner.items[0]._inner.children.find(x => x.key === path[2]).schema;
+    if(inner.schemaType !== 'array') {
+      return inner;
+    }
+
+    return this.getInnerSchema(inner, path.slice(2))
+  }
 
   formOnBlur = el => {
     return event => {
@@ -465,15 +468,16 @@ export default class SemanticUiReactValidatedForm extends Component {
         }
 
         let blurSchemaExtension = {};
+        let _name = toPath(el.props.name);
+        let _value = this.getInnerSchema(validateSchema, _name);
         if (this.shouldExtendBlurValidationSchema(el)) {
-          let _name = this.handleArrayName(el.props.name);
+          set(blurSchemaExtension, _name[0], _value);
+        }
 
-          let _value = get(validateSchema, _name);
-          set(blurSchemaExtension, _name, _value);
-
-          if (_value.schemaType === 'number') {
-            set(model, _name, parseFloat(get(model, _name)));
-          }
+        let valueOrInner = this.getInnerSchema(_value, _name);
+        if (valueOrInner.schemaType === 'number') {
+          let value = defaultTo(parseFloat(get(model, _name)), 0);
+          set(model, _name, value);
         }
 
         const blurSchema = { ...activeSchema, ...blurSchemaExtension };
@@ -506,12 +510,12 @@ export default class SemanticUiReactValidatedForm extends Component {
   fieldErrorDetails = el => {
     const { validationResult } = this.state;
     return get(validationResult, 'error.details', []).filter(detail => {
-      let _name = this.handleArrayName(el.props.name);
+      let _name = toPath(el.props.name);
 
       return (
-        detail.path.indexOf(_name) > -1 ||
         detail.context.key === _name ||
-        detail.path.join('.') == _name
+        detail.path.join('.') == _name ||
+        detail.path.join('.') == _name.join('.')
       );
     });
   };
@@ -548,7 +552,7 @@ export default class SemanticUiReactValidatedForm extends Component {
     );
   };
 
-  // aWhen processing, if an array was changed
+  // When processing, if an array was changed
   // this determines if the processed element  was contained
   // in the array thus forcing an update to prevent undiffed elements
   thisArrayChangedWhenProcessingElement = name => {

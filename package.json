@@ -17,7 +17,7 @@
     "preversion": "npm run test",
     "prepublishOnly": "npm run dist:es6 && npm run dist:modules",
     "postpublish": "npm run gh-pages && npm run gh-pages:deploy",
-    "postinstall": "node lib/post_install.js"
+    "storybook": "start-storybook -p 9001 -c .storybook"
   },
   "main": "dist-modules",
   "module": "dist-es6",
@@ -39,11 +39,12 @@
     "@babel/preset-flow": "7.0.0",
     "@babel/preset-react": "7.0.0",
     "@babel/runtime": "7.2.0",
+    "@storybook/react": "^4.1.9",
     "@svgr/webpack": "4.1.0",
     "@types/lodash-es": "^4.17.1",
     "autoprefixer": "9.4.2",
     "babel-eslint": "10.0.1",
-    "babel-jest": "23.6.0",
+    "babel-jest": "^23.6.0",
     "babel-loader": "8.0.4",
     "catalog": "^3.6.0",
     "chai": "^4.2.0",
@@ -102,6 +103,7 @@
     "test"
   ],
   "dependencies": {
+    "babel-core": "^7.0.0-bridge.0",
     "joi-browser": "^13.4.0",
     "lodash": "^4.17.11",
     "semantic-ui-react": "^0.83.0"
