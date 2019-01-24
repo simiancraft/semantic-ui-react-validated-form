@@ -16,7 +16,6 @@
     "dist:modules": "del-cli ./dist-modules && cross-env BABEL_ENV=modules babel ./src --out-dir ./dist-modules",
     "preversion": "npm run test",
     "prepublishOnly": "npm run dist:es6 && npm run dist:modules",
-    "postpublish": "npm run gh-pages && npm run gh-pages:deploy",
     "storybook": "start-storybook -p 9001 -c .storybook"
   },
   "main": "dist-modules",
@@ -58,6 +57,7 @@
     "eslint-plugin-jsx-a11y": "^6.1.2",
     "eslint-plugin-prettier": "^3.0.0",
     "eslint-plugin-react": "^7.11.1",
+    "extract-text-webpack-plugin": "^4.0.0-beta.0",
     "gh-pages": "^2.0.1",
     "git-prepush-hook": "^1.0.2",
     "import-sort-style-module": "^5.0.0",
