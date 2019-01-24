@@ -21,6 +21,7 @@ import isFunction from 'lodash/isFunction';
 import keys from 'lodash/keys';
 import set from 'lodash/set';
 import toPath from 'lodash/toPath';
+import defaultTo from 'lodash/defaultTo';
 
 const FORM_WHITELIST = [
   Input,
@@ -432,13 +433,24 @@ export default class SemanticUiReactValidatedForm extends Component {
     const { validateSchema } = this.props;
     const { activeSchema } = this.state;
 
-    console.log('active schema', validateSchema, activeSchema);
-
     let _name = toPath(el.props.name);
     const notYetAttached = !get(activeSchema, _name[0]);
     const shouldBeAttached = get(validateSchema, _name[0]);
     return notYetAttached && shouldBeAttached;
   };
+
+  getInnerSchema(schema, path) {
+    if(schema.schemaType !== 'array') {
+      return defaultTo(get(schema, path[0]), schema);
+    }
+
+    let inner = schema._inner.items[0]._inner.children.find(x => x.key === path[2]).schema;
+    if(inner.schemaType !== 'array') {
+      return inner;
+    }
+
+    return this.getInnerSchema(inner, path.slice(2))
+  }
 
   formOnBlur = el => {
     return event => {
@@ -456,20 +468,16 @@ export default class SemanticUiReactValidatedForm extends Component {
         }
 
         let blurSchemaExtension = {};
+        let _name = toPath(el.props.name);
+        let _value = this.getInnerSchema(validateSchema, _name);
         if (this.shouldExtendBlurValidationSchema(el)) {
-          let _name = toPath(el.props.name);
-
-          console.log('checking for blur', validateSchema);
-          let _value = get(validateSchema, _name[0]);
           set(blurSchemaExtension, _name[0], _value);
+        }
 
-          if (_value.schemaType === 'number') {
-            let value = parseFloat(get(model, _name));
-            if (isNaN(value)) {
-              value = 0;
-            }
-            set(model, _name, value);
-          }
+        let valueOrInner = this.getInnerSchema(_value, _name);
+        if (valueOrInner.schemaType === 'number') {
+          let value = defaultTo(parseFloat(get(model, _name)), 0);
+          set(model, _name, value);
         }
 
         const blurSchema = { ...activeSchema, ...blurSchemaExtension };
