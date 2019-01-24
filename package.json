@@ -17,7 +17,8 @@
     "preversion": "npm run test",
     "prepublishOnly": "npm run dist:es6 && npm run dist:modules",
     "postpublish": "npm run gh-pages && npm run gh-pages:deploy",
-    "postinstall": "node lib/post_install.js"
+    "postinstall": "node lib/post_install.js",
+    "storybook": "start-storybook -p 9001 -c .storybook"
   },
   "main": "dist-modules",
   "module": "dist-es6",
@@ -39,6 +40,7 @@
     "@babel/preset-flow": "7.0.0",
     "@babel/preset-react": "7.0.0",
     "@babel/runtime": "7.2.0",
+    "@storybook/react": "^4.1.9",
     "@svgr/webpack": "4.1.0",
     "@types/lodash-es": "^4.17.1",
     "autoprefixer": "9.4.2",

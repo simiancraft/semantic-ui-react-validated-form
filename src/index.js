@@ -20,6 +20,7 @@ import isArray from 'lodash/isArray';
 import isFunction from 'lodash/isFunction';
 import keys from 'lodash/keys';
 import set from 'lodash/set';
+import toPath from 'lodash/toPath';
 
 const FORM_WHITELIST = [
   Input,
@@ -431,22 +432,12 @@ export default class SemanticUiReactValidatedForm extends Component {
     const { validateSchema } = this.props;
     const { activeSchema } = this.state;
 
-    let _name = this.handleArrayName(el.props.name);
-    const notYetAttached = !get(activeSchema, _name);
-    const shouldBeAttached = get(validateSchema, _name);
-    return notYetAttached && shouldBeAttached;
-  };
+    console.log('active schema', validateSchema, activeSchema);
 
-  //TODO: currently only does arrays one level deep
-  // a resursive pattern might handle n-level arrary depth
-  // but then again... you can just use a new
-  // ValidatedForm
-  handleArrayName = name => {
-    let _name = name;
-    if (indexOf(_name, '[') > -1) {
-      _name = _name.substr(0, indexOf(_name, '['));
-    }
-    return _name;
+    let _name = toPath(el.props.name);
+    const notYetAttached = !get(activeSchema, _name[0]);
+    const shouldBeAttached = get(validateSchema, _name[0]);
+    return notYetAttached && shouldBeAttached;
   };
 
   formOnBlur = el => {
@@ -466,13 +457,18 @@ export default class SemanticUiReactValidatedForm extends Component {
 
         let blurSchemaExtension = {};
         if (this.shouldExtendBlurValidationSchema(el)) {
-          let _name = this.handleArrayName(el.props.name);
+          let _name = toPath(el.props.name);
 
-          let _value = get(validateSchema, _name);
-          set(blurSchemaExtension, _name, _value);
+          console.log('checking for blur', validateSchema);
+          let _value = get(validateSchema, _name[0]);
+          set(blurSchemaExtension, _name[0], _value);
 
           if (_value.schemaType === 'number') {
-            set(model, _name, parseFloat(get(model, _name)));
+            let value = parseFloat(get(model, _name));
+            if (isNaN(value)) {
+              value = 0;
+            }
+            set(model, _name, value);
           }
         }
 
@@ -506,12 +502,12 @@ export default class SemanticUiReactValidatedForm extends Component {
   fieldErrorDetails = el => {
     const { validationResult } = this.state;
     return get(validationResult, 'error.details', []).filter(detail => {
-      let _name = this.handleArrayName(el.props.name);
+      let _name = toPath(el.props.name);
 
       return (
-        detail.path.indexOf(_name) > -1 ||
         detail.context.key === _name ||
-        detail.path.join('.') == _name
+        detail.path.join('.') == _name ||
+        detail.path.join('.') == _name.join('.')
       );
     });
   };
@@ -548,7 +544,7 @@ export default class SemanticUiReactValidatedForm extends Component {
     );
   };
 
-  // aWhen processing, if an array was changed
+  // When processing, if an array was changed
   // this determines if the processed element  was contained
   // in the array thus forcing an update to prevent undiffed elements
   thisArrayChangedWhenProcessingElement = name => {
