@@ -20,6 +20,14 @@ storiesOf('ValidatedForm', module)
     const initial = {
       foo: 'foo',
       bar: '',
+      ban: {
+        foo: '',
+        bar: '',
+        baz: {
+          foo: '',
+          bar: '',
+        }
+      },
       baz: [{
         key: '',
         value: ''
@@ -32,6 +40,14 @@ storiesOf('ValidatedForm', module)
     const validateSchema = {
       foo: Joi.number(),
       bar: Joi.number(),
+      ban: Joi.object({
+        foo: Joi.number(),
+        bar: Joi.string().required(),
+        baz: Joi.object({
+          foo: Joi.number(),
+          bar: Joi.string().required()
+        })
+      }),
       baz: Joi.array().items(Joi.object({
         key: Joi.string(),
         value: Joi.number()
@@ -80,6 +96,22 @@ storiesOf('ValidatedForm', module)
         <Form.Input
           label='bar'
           name='bar'
+        />
+        <Form.Input
+          label='ban - foo'
+          name='ban.foo'
+        />
+        <Form.Input
+          label='ban - bar'
+          name='ban.bar'
+        />
+        <Form.Input
+          label='ban - baz - foo'
+          name='ban.baz.foo'
+        />
+        <Form.Input
+          label='ban - baz - bar'
+          name='ban.baz.bar'
         />
         {toList(initial.baz)}
       </ValidatedForm>

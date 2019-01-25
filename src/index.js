@@ -440,12 +440,27 @@ export default class SemanticUiReactValidatedForm extends Component {
   };
 
   getInnerSchema(schema, path) {
+    let inner;
     if(schema.schemaType !== 'array') {
-      return defaultTo(get(schema, path[0]), schema);
+      inner = defaultTo(get(schema, path[0]), schema);
+      if(inner.schemaType !== 'object' || path.length === 1) {
+        return inner;
+      }
+      inner = defaultTo(inner._inner.children.find(x => x.key === path[1]), {schema}).schema;
+
+      if(inner.schemaType === 'object' || inner.schemaType === 'array') {
+        console.log('getting', inner, path);
+        return this.getInnerSchema(inner, path.slice(1));
+      }
+
+      return inner;
     }
 
-    let inner = schema._inner.items[0]._inner.children.find(x => x.key === path[2]).schema;
+    inner = schema._inner.items[0]._inner.children.find(x => x.key === path[2]).schema;
     if(inner.schemaType !== 'array') {
+      if(inner.schemaType === 'object') {
+        return this.getInnerSchema(inner, path.slice(2));
+      }
       return inner;
     }
 
@@ -469,12 +484,14 @@ export default class SemanticUiReactValidatedForm extends Component {
 
         let blurSchemaExtension = {};
         let _name = toPath(el.props.name);
-        let _value = this.getInnerSchema(validateSchema, _name);
+        let _value = this.getInnerSchema(validateSchema, [_name[0]]);
         if (this.shouldExtendBlurValidationSchema(el)) {
+          console.log('adding to blur', _value);
           set(blurSchemaExtension, _name[0], _value);
         }
 
         let valueOrInner = this.getInnerSchema(_value, _name);
+        console.log('inner', valueOrInner);
         if (valueOrInner.schemaType === 'number') {
           let value = defaultTo(parseFloat(get(model, _name)), 0);
           set(model, _name, value);
@@ -539,7 +556,7 @@ export default class SemanticUiReactValidatedForm extends Component {
       return (
         <List.Item key={`${detail.key}-${index}`}>
           <List.Icon name="warning circle" color="red" />
-          {detail.message.replace(el.props.label, '').replace(/""/, '')}
+          {detail.message.replace(/".*"/g, '')}
         </List.Item>
       );
     }
