@@ -439,6 +439,7 @@ export default class SemanticUiReactValidatedForm extends Component {
     return notYetAttached && shouldBeAttached;
   };
 
+  //TODO: Use describe when getting schema, it simplifies it internally.
   getInnerSchema(schema, path) {
     let inner;
     if(schema.schemaType !== 'array') {
@@ -446,17 +447,23 @@ export default class SemanticUiReactValidatedForm extends Component {
       if(inner.schemaType !== 'object' || path.length === 1) {
         return inner;
       }
+
       inner = defaultTo(inner._inner.children.find(x => x.key === path[1]), {schema}).schema;
 
       if(inner.schemaType === 'object' || inner.schemaType === 'array') {
-        console.log('getting', inner, path);
         return this.getInnerSchema(inner, path.slice(1));
       }
 
       return inner;
     }
 
-    inner = schema._inner.items[0]._inner.children.find(x => x.key === path[2]).schema;
+    inner = schema._inner.items[0] && schema._inner.items[0]._inner.children
+      ? schema._inner.items[0]._inner.children.find(x => x.key === path[2]).schema
+      : schema._inner.items[0];
+
+    inner = inner || schema._currentJoi;
+
+    // console.log('inner', schema, inner);
     if(inner.schemaType !== 'array') {
       if(inner.schemaType === 'object') {
         return this.getInnerSchema(inner, path.slice(2));

@@ -1,21 +1,87 @@
 import './styles/test.css';
 
-import React from 'react';
+import React, {Component} from 'react';
 import { storiesOf } from '@storybook/react';
 import { Button, Form, List } from 'semantic-ui-react';
 import Joi from 'joi-browser';
+import toPath from 'lodash/toPath';
 
 import ValidatedForm from '../index.js';
 
-storiesOf('Button', module)
-  .add('with text', () => (
-    <Button>Hello Button</Button>
-  ))
-  .add('with some emoji', () => (
-    <Button><span role="img" aria-label="so cool">😀 😎 👍 💯</span></Button>
-  ));
-
+class NestedInput extends Component {
+  render() {
+    const props = this.props;
+    return <Form.Input {...props} />
+  }
+}
+const getElement = (field) => {
+  const {label, name} = field;
+  return <NestedInput label={label} name={name} />
+}
 storiesOf('ValidatedForm', module)
+  .add('plain array', () => {
+    const initial = {
+      foo: [],
+    };
+
+    const validateSchema = {
+      foo: Joi.array().min(1),
+    }
+
+
+    return (
+      <ValidatedForm
+        initialValue={initial}
+        value={initial}
+        validateSchema={validateSchema}
+        whitelist={[NestedInput]}
+        onChange={(e, value, validation)=>{
+          console.log(value, validation);
+        }}
+      >
+        <Form.Select
+          label='foo'
+          name='foo'
+          multiple
+          options={[
+            {text: 'a', value:'a'},
+            {text: 'b', value:'b'}
+          ]}
+        />
+      </ValidatedForm>
+    );
+  })
+  .add('nested input component', () => {
+    const initial = {
+      foo: 'foo',
+      'bar test': ''
+    };
+
+    const validateSchema = {
+      foo: Joi.number(),
+      'bar test': Joi.number()
+    }
+
+    const child = getElement({label: 'bar', name: 'bar test'});
+
+    return (
+      <ValidatedForm
+        initialValue={initial}
+        value={initial}
+        validateSchema={validateSchema}
+        whitelist={[NestedInput]}
+        onChange={(e, value, validation)=>{
+          console.log(value, validation);
+        }}
+      >
+        <Form.Input
+          label='foo'
+          name='foo'
+        />
+        {child}
+      </ValidatedForm>
+    );
+  })
   .add('example form', () => {
     const initial = {
       foo: 'foo',
