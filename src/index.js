@@ -252,6 +252,9 @@ export default class SemanticUiReactValidatedForm extends Component {
       if (!isArray(model[key])) {
         return false;
       }
+      if(!isArray(previousModel[key])) {
+        return false;
+      }
       if (model[key].length === previousModel[key].length) {
         return false;
       }
