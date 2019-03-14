@@ -82,6 +82,43 @@ storiesOf('ValidatedForm', module)
       </ValidatedForm>
     );
   })
+  .add('read only per element', () => {
+    const initial = {
+      foo: 'foo',
+      bar: 'bax'
+    };
+
+    const validateSchema = {
+      foo: Joi.number(),
+      bar: Joi.number()
+    }
+
+    return (
+      <ValidatedForm
+        initialValue={initial}
+        value={initial}
+        readOnly={false}
+        validateSchema={validateSchema}
+        whitelist={[NestedInput]}
+        onChange={(e, value, validation)=>{
+          console.log(value, validation);
+        }}
+      >
+        <Form.Input
+          label='foo'
+          name='foo'
+          readOnly={false}
+        />
+        <Form.Input
+          label='bar'
+          name='bar'
+          readOnly={true}
+        />
+
+      </ValidatedForm>
+    );
+  })
+
   .add('example form', () => {
     const initial = {
       foo: 'foo',

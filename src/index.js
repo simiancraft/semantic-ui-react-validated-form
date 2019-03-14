@@ -169,8 +169,9 @@ export default class SemanticUiReactValidatedForm extends Component {
 
     if (this.childShouldBeModified(el)) {
       const { name } = el.props;
+      const childReadOnly = el.props.readOnly;
 
-      const isReadOnly = readOnly === true;
+      const isReadOnly = readOnly === true || childReadOnly === true;
 
       let extendedBehavior = isReadOnly
         ? {}
