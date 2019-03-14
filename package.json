@@ -3,7 +3,7 @@
   "description": "A Validated form that consumes joi schemas and semantic ui components",
   "author": "Jesse Harlin",
   "user": "the-simian",
-  "version": "0.4.0",
+  "version": "0.5.0",
   "scripts": {
     "start": "catalog start docs",
     "test": "jest",
