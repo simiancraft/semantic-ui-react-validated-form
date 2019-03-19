@@ -128,7 +128,7 @@ storiesOf('ValidatedForm', module)
         bar: '',
         baz: {
           foo: '',
-          bar: '',
+          bar: 'baz',
         }
       },
       baz: [{

@@ -106,6 +106,6 @@
     "babel-core": "^7.0.0-bridge.0",
     "joi-browser": "^13.4.0",
     "lodash": "^4.17.11",
-    "semantic-ui-react": "^0.84.0"
+    "semantic-ui-react": "^0.86.0"
   }
 }
