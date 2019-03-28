@@ -168,7 +168,6 @@ export default class SemanticUiReactValidatedForm extends Component {
     let el = child;
 
     if (this.childShouldBeModified(el)) {
-      console.log('modifying', el);
       const { name } = el.props;
       const childReadOnly = el.props.readOnly;
 
@@ -236,8 +235,6 @@ export default class SemanticUiReactValidatedForm extends Component {
       if (isFocused) {
         _props.open = inError;
       }
-
-      console.log('MAKING EL', el);
 
       el = <ValidatedFormfield {..._props} />;
     }
@@ -461,7 +458,6 @@ export default class SemanticUiReactValidatedForm extends Component {
 
     inner = inner || schema._currentJoi;
 
-    // console.log('inner', schema, inner);
     if(inner.schemaType !== 'array') {
       if(inner.schemaType === 'object') {
         return this.getInnerSchema(inner, path.slice(2));
@@ -491,12 +487,10 @@ export default class SemanticUiReactValidatedForm extends Component {
         let _name = toPath(el.props.name);
         let _value = this.getInnerSchema(validateSchema, [_name[0]]);
         if (this.shouldExtendBlurValidationSchema(el)) {
-          console.log('adding to blur', _value);
           set(blurSchemaExtension, _name[0], _value);
         }
 
         let valueOrInner = this.getInnerSchema(_value, _name);
-        console.log('inner', valueOrInner);
         if (valueOrInner.schemaType === 'number') {
           let value = defaultTo(parseFloat(get(model, _name)), 0);
           set(model, _name, value);
