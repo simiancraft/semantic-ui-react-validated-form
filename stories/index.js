@@ -11,7 +11,7 @@ import ValidatedForm from '../index.js';
 class NestedInput extends Component {
   render() {
     const props = this.props;
-    return <Form.Input {...props} />
+    return <Form.Input {...this.props} />;
   }
 }
 const getElement = (field) => {
@@ -27,7 +27,6 @@ storiesOf('ValidatedForm', module)
     const validateSchema = {
       foo: Joi.array().min(1),
     }
-
 
     return (
       <ValidatedForm
@@ -62,7 +61,9 @@ storiesOf('ValidatedForm', module)
       'bar test': Joi.number()
     }
 
-    const child = getElement({label: 'bar', name: 'bar test'});
+    // const child = getElement({label: 'bar', name: 'bar test'});
+    const child = (<NestedInput label={'bar'} name={'bar test'} />);
+    const readOnlyChild = (<NestedInput label={'bar'} name={'bar test'} readOnly={true}/>);
 
     return (
       <ValidatedForm
@@ -79,6 +80,7 @@ storiesOf('ValidatedForm', module)
           name='foo'
         />
         {child}
+        {readOnlyChild}
       </ValidatedForm>
     );
   })
@@ -99,7 +101,7 @@ storiesOf('ValidatedForm', module)
         value={initial}
         readOnly={false}
         validateSchema={validateSchema}
-        whitelist={[NestedInput]}
+        // whitelist={[NestedInput]}
         onChange={(e, value, validation)=>{
           console.log(value, validation);
         }}

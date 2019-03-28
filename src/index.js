@@ -168,6 +168,7 @@ export default class SemanticUiReactValidatedForm extends Component {
     let el = child;
 
     if (this.childShouldBeModified(el)) {
+      console.log('modifying', el);
       const { name } = el.props;
       const childReadOnly = el.props.readOnly;
 
@@ -236,6 +237,8 @@ export default class SemanticUiReactValidatedForm extends Component {
         _props.open = inError;
       }
 
+      console.log('MAKING EL', el);
+
       el = <ValidatedFormfield {..._props} />;
     }
 
@@ -288,26 +291,16 @@ export default class SemanticUiReactValidatedForm extends Component {
     abortEarly: false
   };
 
-  targetFormTypes = () => {
-    return FORM_WHITELIST.concat(this.props.whitelist || []);
-  };
-  haltOnFormTypes = () => {
-    return IGNORE_CHILDREN.concat(this.props.ignoreChildrenList || []);
-  };
-
-  trueIfAnyAreTrue = child => (acc, type) => {
-    if (acc) {
-      return true;
-    }
-    return child.type === type;
-  };
-
   childShouldIgnoreChildren = child => {
-    return this.haltOnFormTypes().reduce(this.trueIfAnyAreTrue(child), false);
+    return IGNORE_CHILDREN
+      .concat(this.props.ignoreChildrenList || [])
+      .some(x => child.type === x);
   };
 
   childShouldBeModified = child => {
-    return this.targetFormTypes().reduce(this.trueIfAnyAreTrue(child), false);
+    return FORM_WHITELIST
+      .concat(this.props.whitelist || [])
+      .some(x => child.type === x);
   };
 
   propertyExistsOnModel = (prop, model) => {
@@ -379,11 +372,12 @@ export default class SemanticUiReactValidatedForm extends Component {
     }
 
     return (
-      <Form.Field {..._elProps}>
-        <label>
+      <Form.Field>
+        <label>{`${_elProps.label}`}</label>
+        <p>
           {`${_val}`}
           &nbsp;
-        </label>
+        </p>
       </Form.Field>
     );
   };
