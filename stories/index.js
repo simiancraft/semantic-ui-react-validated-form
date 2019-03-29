@@ -87,7 +87,8 @@ storiesOf('ValidatedForm', module)
   .add('read only per element', () => {
     const initial = {
       foo: 'foo',
-      bar: 'bax'
+      bar: 'bax',
+      baz: 'bax'
     };
 
     const validateSchema = {
@@ -116,6 +117,21 @@ storiesOf('ValidatedForm', module)
           name='bar'
           readOnly={true}
         />
+        <Form.Input
+          name='baz'
+          readOnly={true}
+        />
+        <Form.Select
+          name='baz'
+          readOnly={true}
+        />
+        <Form.TextArea
+          name='baz'
+          readOnly={true}
+        />
+
+
+
 
       </ValidatedForm>
     );

@@ -343,7 +343,7 @@ export default class SemanticUiReactValidatedForm extends Component {
     if (el.type === Form.TextArea) {
       return (
         <Form.Field>
-          <label>{`${_elProps.label}`}</label>
+        {_elProps.label ? <label>{`${_elProps.label}`}</label> : null}
           <p>
             {`${_val}`}
             &nbsp;
@@ -359,7 +359,7 @@ export default class SemanticUiReactValidatedForm extends Component {
       }
       return (
         <Form.Field>
-          <label>{`${_elProps.label}`}</label>
+        {_elProps.label ? <label>{`${_elProps.label}`}</label> : null}
           <p>
             {`${_val}`}
             &nbsp;
@@ -370,7 +370,7 @@ export default class SemanticUiReactValidatedForm extends Component {
 
     return (
       <Form.Field>
-        <label>{`${_elProps.label}`}</label>
+        {_elProps.label ? <label>{`${_elProps.label}`}</label> : null}
         <p>
           {`${_val}`}
           &nbsp;
